@@ -3,29 +3,25 @@ from app.config import get_settings
 
 
 def send_email(to_email: str, subject: str, html_body: str) -> dict:
-    """Send an email using Mailjet HTTP API."""
+    """Send an email using SendGrid HTTP API."""
     settings = get_settings()
 
     response = httpx.post(
-        "https://api.mailjet.com/v3.1/send",
-        auth=(settings.mailjet_api_key, settings.mailjet_secret_key),
+        "https://api.sendgrid.com/v3/mail/send",
+        headers={
+            "Authorization": f"Bearer {settings.sendgrid_api_key}",
+            "Content-Type": "application/json",
+        },
         json={
-            "Messages": [
-                {
-                    "From": {
-                        "Email": settings.sender_email,
-                        "Name": "Sales Insight Automator",
-                    },
-                    "To": [{"Email": to_email}],
-                    "Subject": subject,
-                    "HTMLPart": html_body,
-                }
-            ]
+            "personalizations": [{"to": [{"email": to_email}]}],
+            "from": {"email": settings.sender_email, "name": "Sales Insight Automator"},
+            "subject": subject,
+            "content": [{"type": "text/html", "value": html_body}],
         },
         timeout=30,
     )
 
     if response.status_code >= 400:
-        raise Exception(f"Mailjet API error {response.status_code}: {response.text}")
+        raise Exception(f"SendGrid API error {response.status_code}: {response.text}")
 
-    return response.json()
+    return {"status": "sent", "status_code": response.status_code}

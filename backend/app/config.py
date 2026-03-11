@@ -4,8 +4,7 @@ from functools import lru_cache
 
 class Settings(BaseSettings):
     groq_api_key: str = ""
-    mailjet_api_key: str = ""
-    mailjet_secret_key: str = ""
+    sendgrid_api_key: str = ""
     sender_email: str = ""
     allowed_origins: str = "http://localhost:3000"
     max_upload_size_mb: int = 10
