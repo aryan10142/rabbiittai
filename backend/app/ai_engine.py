@@ -7,7 +7,7 @@ def generate_summary(data_text: str) -> str:
     settings = get_settings()
     genai.configure(api_key=settings.gemini_api_key)
 
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    model = genai.GenerativeModel("gemini-2.0-flash")
 
     prompt = f"""You are a senior business analyst. Analyze the following sales data and 
 produce a professional executive summary suitable for C-level leadership.
