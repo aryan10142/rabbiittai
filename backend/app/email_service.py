@@ -1,28 +1,23 @@
-import httpx
+import smtplib
+import ssl
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from app.config import get_settings
 
 
 def send_email(to_email: str, subject: str, html_body: str) -> dict:
-    """Send an email using Brevo (Sendinblue) transactional email HTTP API."""
+    """Send an email using Gmail SMTP over SSL."""
     settings = get_settings()
 
-    response = httpx.post(
-        "https://api.brevo.com/v3/smtp/email",
-        headers={
-            "api-key": settings.brevo_api_key,
-            "Content-Type": "application/json",
-            "accept": "application/json",
-        },
-        json={
-            "sender": {"name": "Sales Insight", "email": settings.sender_email},
-            "to": [{"email": to_email}],
-            "subject": subject,
-            "htmlContent": html_body,
-        },
-        timeout=30,
-    )
+    msg = MIMEMultipart("alternative")
+    msg["From"] = settings.smtp_email
+    msg["To"] = to_email
+    msg["Subject"] = subject
+    msg.attach(MIMEText(html_body, "html"))
 
-    if response.status_code >= 400:
-        raise Exception(f"Brevo API error {response.status_code}: {response.text}")
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context, timeout=30) as server:
+        server.login(settings.smtp_email, settings.smtp_password)
+        server.sendmail(settings.smtp_email, to_email, msg.as_string())
 
-    return response.json()
+    return {"status": "sent", "to": to_email}
