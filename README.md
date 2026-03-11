@@ -14,7 +14,7 @@ Built for **Rabbitt AI** as a quick-response tool for the sales team.
 │   Frontend   │  ◀────────────────────────────  │   Backend     │
 │  (React SPA) │       JSON response            │               │
 └──────────────┘                                 │  ┌──────────┐ │
-                                                 │  │ Gemini   │ │
+                                                 │  │ Groq     │ │
                                                  │  │ LLM      │ │
                                                  │  └──────────┘ │
                                                  │  ┌──────────┐ │
@@ -39,7 +39,7 @@ Built for **Rabbitt AI** as a quick-response tool for the sales team.
 
 ### Prerequisites
 - Docker & Docker Compose installed
-- API keys for **Google Gemini** and **Resend**
+- API keys for **Groq** and **Resend**
 
 ### Steps
 
@@ -135,7 +135,7 @@ A GitHub Actions workflow (`.github/workflows/ci.yml`) triggers on every **Pull 
 |-----------|-----------|
 | Frontend | Next.js 15 · React 19 · Tailwind CSS 4 |
 | Backend | FastAPI · Python 3.12 |
-| AI Engine | Google Gemini 1.5 Flash |
+| AI Engine | Groq · Llama 3.3 70B Versatile |
 | Email | Resend |
 | Containerization | Docker · Docker Compose |
 | CI/CD | GitHub Actions |
@@ -146,7 +146,7 @@ A GitHub Actions workflow (`.github/workflows/ci.yml`) triggers on every **Pull 
 ## `.env.example`
 
 ```env
-GEMINI_API_KEY=your_gemini_api_key_here
+GROQ_API_KEY=your_groq_api_key_here
 RESEND_API_KEY=your_resend_api_key_here
 FROM_EMAIL=onboarding@resend.dev
 ALLOWED_ORIGINS=http://localhost:3000

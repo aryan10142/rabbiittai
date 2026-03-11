@@ -3,7 +3,7 @@ from functools import lru_cache
 
 
 class Settings(BaseSettings):
-    gemini_api_key: str = ""
+    groq_api_key: str = ""
     resend_api_key: str = ""
     from_email: str = "onboarding@resend.dev"
     allowed_origins: str = "http://localhost:3000"

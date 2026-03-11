@@ -227,7 +227,7 @@ export default function Home() {
 
         {/* Footer */}
         <p className="text-center text-xs text-gray-600">
-          Powered by Rabbitt AI · Gemini · Resend
+          Powered by Rabbitt AI · Groq · Resend
         </p>
       </div>
     </main>

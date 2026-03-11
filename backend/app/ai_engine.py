@@ -1,13 +1,11 @@
-import google.generativeai as genai
+from groq import Groq
 from app.config import get_settings
 
 
 def generate_summary(data_text: str) -> str:
-    """Use Google Gemini to generate a professional sales narrative summary."""
+    """Use Groq (Llama 3) to generate a professional sales narrative summary."""
     settings = get_settings()
-    genai.configure(api_key=settings.gemini_api_key)
-
-    model = genai.GenerativeModel("gemini-2.0-flash")
+    client = Groq(api_key=settings.groq_api_key)
 
     prompt = f"""You are a senior business analyst. Analyze the following sales data and 
 produce a professional executive summary suitable for C-level leadership.
@@ -28,5 +26,10 @@ Do NOT include ```html fences. Return raw HTML only.
 --- DATA END ---
 """
 
-    response = model.generate_content(prompt)
-    return response.text
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.4,
+        max_tokens=4096,
+    )
+    return response.choices[0].message.content
