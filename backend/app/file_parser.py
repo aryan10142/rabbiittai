@@ -25,7 +25,14 @@ async def parse_file(file: UploadFile) -> pd.DataFrame:
 
     try:
         if ext == ".csv":
-            df = pd.read_csv(io.BytesIO(contents))
+            for encoding in ("utf-8", "latin1", "cp1252"):
+                try:
+                    df = pd.read_csv(io.BytesIO(contents), encoding=encoding)
+                    break
+                except UnicodeDecodeError:
+                    continue
+            else:
+                raise ValueError("Could not decode CSV with any supported encoding")
         else:
             df = pd.read_excel(io.BytesIO(contents), engine="openpyxl")
     except Exception as exc:
