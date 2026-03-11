@@ -3,12 +3,14 @@ from slowapi import Limiter
 from slowapi.util import get_remote_address
 from pydantic import EmailStr
 import re
+import logging
 
 from app.file_parser import parse_file, dataframe_to_summary_text
 from app.ai_engine import generate_summary
 from app.email_service import send_email
 from app.config import get_settings
 
+logger = logging.getLogger(__name__)
 limiter = Limiter(key_func=get_remote_address)
 router = APIRouter()
 
@@ -74,7 +76,9 @@ async def analyze_and_send(
     data_text = dataframe_to_summary_text(df)
     try:
         summary_html = generate_summary(data_text)
+        logger.info("AI summary generated successfully")
     except Exception as exc:
+        logger.error(f"AI summary generation failed: {exc}")
         raise HTTPException(
             status_code=500, detail=f"AI summary generation failed: {exc}"
         )
@@ -86,7 +90,9 @@ async def analyze_and_send(
             subject="Sales Insight Report — AI-Generated Summary",
             html_body=summary_html,
         )
+        logger.info(f"Email sent to {email}")
     except Exception as exc:
+        logger.error(f"Email delivery failed: {exc}")
         raise HTTPException(status_code=500, detail=f"Email delivery failed: {exc}")
 
     return {

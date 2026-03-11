@@ -14,7 +14,7 @@ def send_email(to_email: str, subject: str, html_body: str) -> dict:
     msg["Subject"] = subject
     msg.attach(MIMEText(html_body, "html"))
 
-    with smtplib.SMTP(settings.smtp_host, settings.smtp_port) as server:
+    with smtplib.SMTP(settings.smtp_host, settings.smtp_port, timeout=30) as server:
         server.starttls()
         server.login(settings.smtp_email, settings.smtp_password)
         server.sendmail(settings.smtp_email, to_email, msg.as_string())
