@@ -1,23 +1,31 @@
-import smtplib
-import ssl
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+import httpx
 from app.config import get_settings
 
 
 def send_email(to_email: str, subject: str, html_body: str) -> dict:
-    """Send an email using Gmail SMTP over SSL."""
+    """Send an email using Mailjet HTTP API."""
     settings = get_settings()
 
-    msg = MIMEMultipart("alternative")
-    msg["From"] = settings.smtp_email
-    msg["To"] = to_email
-    msg["Subject"] = subject
-    msg.attach(MIMEText(html_body, "html"))
+    response = httpx.post(
+        "https://api.mailjet.com/v3.1/send",
+        auth=(settings.mailjet_api_key, settings.mailjet_secret_key),
+        json={
+            "Messages": [
+                {
+                    "From": {
+                        "Email": settings.sender_email,
+                        "Name": "Sales Insight Automator",
+                    },
+                    "To": [{"Email": to_email}],
+                    "Subject": subject,
+                    "HTMLPart": html_body,
+                }
+            ]
+        },
+        timeout=30,
+    )
 
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context, timeout=30) as server:
-        server.login(settings.smtp_email, settings.smtp_password)
-        server.sendmail(settings.smtp_email, to_email, msg.as_string())
+    if response.status_code >= 400:
+        raise Exception(f"Mailjet API error {response.status_code}: {response.text}")
 
-    return {"status": "sent", "to": to_email}
+    return response.json()
