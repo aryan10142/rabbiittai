@@ -28,10 +28,10 @@ Built for **Rabbitt AI** as a quick-response tool for the sales team.
 
 | Service | URL |
 |---------|-----|
-| Frontend | `<YOUR_VERCEL_URL>` |
-| Backend API | `<YOUR_RENDER_URL>` |
-| Swagger Docs | `<YOUR_RENDER_URL>/docs` |
-| ReDoc | `<YOUR_RENDER_URL>/redoc` |
+| Frontend | https://frontend-seven-rose-42.vercel.app |
+| Backend API | https://sales-insight-api-production.up.railway.app |
+| Swagger Docs | https://sales-insight-api-production.up.railway.app/docs |
+| ReDoc | https://sales-insight-api-production.up.railway.app/redoc |
 
 ---
 
