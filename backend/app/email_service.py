@@ -1,21 +1,27 @@
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+import httpx
 from app.config import get_settings
 
 
 def send_email(to_email: str, subject: str, html_body: str) -> dict:
-    """Send an email using Gmail SMTP."""
+    """Send an email using SendGrid HTTP API."""
     settings = get_settings()
 
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = subject
-    msg["From"] = f"Sales Insight Automator <{settings.smtp_email}>"
-    msg["To"] = to_email
-    msg.attach(MIMEText(html_body, "html"))
+    response = httpx.post(
+        "https://api.sendgrid.com/v3/mail/send",
+        headers={
+            "Authorization": f"Bearer {settings.sendgrid_api_key}",
+            "Content-Type": "application/json",
+        },
+        json={
+            "personalizations": [{"to": [{"email": to_email}]}],
+            "from": {"email": settings.sender_email, "name": "Sales Insight Automator"},
+            "subject": subject,
+            "content": [{"type": "text/html", "value": html_body}],
+        },
+        timeout=30,
+    )
 
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=30) as server:
-        server.login(settings.smtp_email, settings.smtp_password)
-        server.sendmail(settings.smtp_email, to_email, msg.as_string())
+    if response.status_code >= 400:
+        raise Exception(f"SendGrid API error {response.status_code}: {response.text}")
 
-    return {"status": "sent"}
+    return {"status": "sent", "status_code": response.status_code}
