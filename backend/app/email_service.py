@@ -1,18 +1,22 @@
-import resend
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from app.config import get_settings
 
 
 def send_email(to_email: str, subject: str, html_body: str) -> dict:
-    """Send an email with the generated summary using Resend."""
+    """Send an email with the generated summary using Gmail SMTP."""
     settings = get_settings()
-    resend.api_key = settings.resend_api_key
 
-    params: resend.Emails.SendParams = {
-        "from": settings.from_email,
-        "to": [to_email],
-        "subject": subject,
-        "html": html_body,
-    }
+    msg = MIMEMultipart("alternative")
+    msg["From"] = settings.smtp_email
+    msg["To"] = to_email
+    msg["Subject"] = subject
+    msg.attach(MIMEText(html_body, "html"))
 
-    response = resend.Emails.send(params)
-    return response
+    with smtplib.SMTP(settings.smtp_host, settings.smtp_port) as server:
+        server.starttls()
+        server.login(settings.smtp_email, settings.smtp_password)
+        server.sendmail(settings.smtp_email, to_email, msg.as_string())
+
+    return {"status": "sent", "to": to_email}

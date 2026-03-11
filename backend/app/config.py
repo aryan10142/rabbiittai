@@ -4,8 +4,10 @@ from functools import lru_cache
 
 class Settings(BaseSettings):
     groq_api_key: str = ""
-    resend_api_key: str = ""
-    from_email: str = "onboarding@resend.dev"
+    smtp_email: str = ""
+    smtp_password: str = ""
+    smtp_host: str = "smtp.gmail.com"
+    smtp_port: int = 587
     allowed_origins: str = "http://localhost:3000"
     max_upload_size_mb: int = 10
     rate_limit: str = "10/minute"
