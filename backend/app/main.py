@@ -1,10 +1,16 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
+import logging
+import traceback
 
 from app.routes import router, limiter
 from app.config import get_settings
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 def create_app() -> FastAPI:
@@ -39,6 +45,15 @@ def create_app() -> FastAPI:
 
     # --- Routes ---
     app.include_router(router, prefix="/api")
+
+    @app.exception_handler(Exception)
+    async def global_exception_handler(request: Request, exc: Exception):
+        tb = traceback.format_exc()
+        logger.error(f"Unhandled exception: {exc}\n{tb}")
+        return JSONResponse(
+            status_code=500,
+            content={"detail": str(exc)},
+        )
 
     return app
 
