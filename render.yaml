@@ -7,12 +7,12 @@ services:
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     rootDir: backend
     envVars:
-      - key: GEMINI_API_KEY
+      - key: GROQ_API_KEY
         sync: false
-      - key: RESEND_API_KEY
+      - key: SMTP_EMAIL
         sync: false
-      - key: FROM_EMAIL
-        value: onboarding@resend.dev
+      - key: SMTP_PASSWORD
+        sync: false
       - key: ALLOWED_ORIGINS
         sync: false
       - key: MAX_UPLOAD_SIZE_MB
